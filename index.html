@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ポケモン風RPGインフォグラフィック</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=DotGothic16&display=swap');
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+        /* ベースデザイン */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #A8DB56; /* 草原風の背景色 */
+            font-family: 'DotGothic16', 'Press Start 2P', monospace;
+            color: #333;
+            overflow-x: hidden;
+            image-rendering: pixelated;
+        }
+
+        /* ゲームウィンドウ */
+        .game-window {
+            background: #F0F8E8;
+            border: 8px solid #3C5AA6; /* ポケモンブルー */
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        /* ピクセル風の境界線 */
+        .pixel-border {
+            position: relative;
+        }
+        .pixel-border::after {
+            content: "";
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border: 4px solid #2A3C75; /* 濃いポケモンブルー */
+            border-radius: 15px;
+            z-index: -1;
+        }
+
+        /* ポケモン風タイトル */
+        .game-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 28px;
+            color: #FFCB05; /* ポケモンイエロー */
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 3px 3px 0 #3C5AA6, /* ポケモンブルー */
+                         -1px -1px 0 #3C5AA6,  
+                         1px -1px 0 #3C5AA6,
+                         -1px 1px 0 #3C5AA6,
+                         1px 1px 0 #3C5AA6;
+            letter-spacing: 2px;
+            padding: 10px;
+            animation: title-bounce 2s infinite;
+        }
+
+        @keyframes title-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* ゲームサブタイトル */
+        .game-subtitle {
+            color: #3C5AA6; /* ポケモンブルー */
+            text-align: center;
+            font-family: 'DotGothic16', monospace;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        /* 対話ボックス */
+        .dialog-box {
+            background: white;
+            border: 5px solid #333;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            position: relative;
+            font-family: 'DotGothic16', monospace;
+        }
+
+        .dialog-box::before {
+            content: "";
+            position: absolute;
+            bottom: -15px;
+            right: 30px;
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 15px solid #333;
+        }
+
+        /* バトル風スタイル */
+        .battle-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .player-info, .enemy-info {
+            background: white;
+            border: 4px solid #333;
+            border-radius: 10px;
+            padding: 10px;
+            width: 45%;
+            position: relative;
+        }
+
+        .hp-bar {
+            height: 15px;
+            width: 100%;
+            background: #FF5959; /* HP赤色 */
+            border: 2px solid #333;
+            border-radius: 10px;
+            margin-top: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hp-bar::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 70%; /* HP量 */
+            background: #59FF59; /* HP緑色 */
+            animation: hp-decrease 2s;
+        }
+
+        /* ポケモン風カード */
+        .mon-card {
+            width: 220px;
+            background: white;
+            border: 5px solid #FFCB05; /* ポケモンイエロー */
+            border-radius: 15px;
+            padding: 15px;
+            position: relative;
+            text-align: center;
+            box-shadow: 0 8px 0 #B8A038; /* 濃いイエロー */
+            transition: all 0.2s;
+            margin: 0 auto 30px auto;
+        }
+
+        .mon-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 13px 0 #B8A038;
+        }
+
+        .mon-card-header {
+            background: #3C5AA6; /* ポケモンブルー */
+            color: white;
+            padding: 8px;
+            border-radius: 8px;
+            margin: -15px -15px 15px -15px;
+            font-weight: bold;
+        }
+
+        .mon-card-avatar {
+            height: 100px;
+            width: 100px;
+            margin: 0 auto 15px auto;
+            background: #F0F8E8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #3C5AA6;
+            font-size: 40px;
+        }
+
+        .mon-card-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+        }
+
+        .mon-card-stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mon-card-type {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            margin: 5px;
+            color: white;
+            font-size: 12px;
+        }
+
+        .electric {
+            background-color: #F8D030;
+        }
+
+        .water {
+            background-color: #6890F0;
+        }
+
+        /* ポケボール装飾 */
+        .pokeball {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(to bottom, #FF5959 50%, white 50%);
+            border-radius: 50%;
+            border: 3px solid #333;
+            position: absolute;
+            transform: rotate(-10deg);
+        }
+
+        .pokeball::before {
+            content: "";
+            position: absolute;
+            top: 18px;
+            left: 18px;
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            border: 3px solid #333;
+            z-index: 1;
+            transform: translate(-50%, -50%);
+        }
+
+        .pokeball::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: #333;
+        }
+
+        /* メニューボタン */
+        .menu-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+
+        .menu-button {
+            background: #3C5AA6; /* ポケモンブルー */
+            color: white;
+            font-family: 'DotGothic16', monospace;
+            font-size: 16px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 0 #2A3C75;
+            transition: all 0.1s;
+            position: relative;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        .menu-button:hover {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #2A3C75;
+        }
+
+        .menu-button:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        /* ポケモン風ボタン */
+        .action-button {
+            display: block;
+            width: 80%;
+            margin: 20px auto;
+            background: #FF5959; /* ポケモン赤 */
+            color: white;
+            font-family: 'DotGothic16', monospace;
+            font-size: 18px;
+            padding: 15px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 0 6px 0 #B33030;
+            transition: all 0.1s;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .action-button:hover {
+            transform: translateY(3px);
+            box-shadow: 0 3px 0 #B33030;
+        }
+
+        .action-button:active {
+            transform: translateY(6px);
+            box-shadow: none;
+        }
+
+        .rpg-list {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+
+        .rpg-list li {
+            position: relative;
+            padding: 5px 0;
+            padding-left: 25px;
+        }
+
+        .rpg-list li::before {
+            content: "➤";
+            position: absolute;
+            left: 0;
+            color: #3C5AA6;
+        }
+
+        .mon-card-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .game-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- メインコンテナ -->
+    <div class="game-container">
+        <!-- タイトル -->
+        <h1 class="game-title">AIローンチの解体新書</h1>
+        <div class="game-subtitle">累計12億売上のAIマーケターによる売上特化のAI活用術</div>
+
+        <!-- メインウィンドウ -->
+        <div class="game-window pixel-border">
+            <!-- 対話ボックス -->
+            <div class="dialog-box">
+                <div class="dialog-text" id="dialog-text">
+                    AIマーケターでぷれが登場！<br>
+                    「期間限定でAIローンチの解体新書を無料配布するぞ！<br>
+                    【2月19日 23:59まで】の期間限定だ。AIを使って売上を伸ばしたい人はすぐに参加してくれ！」
+                </div>
+            </div>
+
+            <!-- バトル画面風レイアウト -->
+            <div class="battle-container">
+                <div class="player-info">
+                    <h3>現状の課題</h3>
+                    <div class="hp-bar"></div>
+                    <p>✅ AIの具体的な効率化方法がわからない</p>
+                    <p>✅ AIを売上に繋げる方法がわからない</p>
+                    <p>✅ AIを実務に活かす方法がわからない</p>
+                </div>
+                <div class="pokeball" style="top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(10deg);"></div>
+                <div class="enemy-info">
+                    <h3>解決策</h3>
+                    <div class="hp-bar" style="background: #59FF59;"></div>
+                    <p><strong>「ローンチ一式制作GPTs：アーサー」</strong></p>
+                    <p>① 商品をAIに読み込ませる<br>
+                    ② AIからの質問に答える</p>
+                    <p>この2ステップで販売導線が作れる！</p>
+                </div>
+            </div>
+
+            <!-- メニューボタン -->
+            <div class="menu-container">
+                <button class="menu-button">もっと知る</button>
+                <button class="menu-button">特典詳細</button>
+                <button class="menu-button">参加方法</button>
+            </div>
+        </div>
+
+        <!-- ポケモンカード風カード -->
+        <div class="mon-card-container">
+            <div class="mon-card">
+                <div class="mon-card-header">AI落とし穴回避</div>
+                <div class="mon-card-avatar">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <p>AIで収益化できない落とし穴を回避する方法を解説</p>
+                <div class="mon-card-stats">
+                    <div class="mon-card-stat">
+                        <span>成功率</span>
+                        <span class="mon-card-stat-value">90%</span>
+                    </div>
+                    <div class="mon-card-stat">
+                        <span>難易度</span>
+                        <span class="mon-card-stat-value">★★☆</span>
+                    </div>
+                </div>
+                <div>
+                    <span class="mon-card-type electric">ノウハウ</span>
+                    <span class="mon-card-type water">初心者向け</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 参加方法 -->
+        <div class="game-window pixel-border">
+            <h3 style="text-align: center; margin-top: 0;">参加方法</h3>
+            <ul class="rpg-list">
+                <li>でぷれ（@ai_depression）をフォロー</li>
+                <li>いいね＆【 参加 】とリプ</li>
+                <li>リプ欄のURLから申込み</li>
+            </ul>
+            <a href="#" class="action-button">今すぐ参加する！</a>
+        </div>
+    </div>
+
+    <!-- JavaScriptアニメーション -->
+    <script>
+        // 対話テキストのタイピングアニメーション
+        function typeWriter(elementId, text, speed) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = "";
+            
+            let i = 0;
+            function typing() {
+                if (i < text.length) {
+                    if (text.charAt(i) === '<' && text.substring(i, i+4) === '<br>') {
+                        element.innerHTML += "<br>";
+                        i += 4;
+                    } else {
+                        element.innerHTML += text.charAt(i);
+                        i++;
+                    }
+                    setTimeout(typing, speed);
+                }
+            }
+            typing();
+        }
+
+        // アニメーションをトリガー
+        document.addEventListener('DOMContentLoaded', function() {
+            const dialogText = "AIマーケターでぷれが登場！<br>「期間限定でAIローンチの解体新書を無料配布するぞ！<br>【2月19日 23:59まで】の期間限定だ。AIを使って売上を伸ばしたい人はすぐに参加してくれ！」";
+            typeWriter("dialog-text", dialogText, 50);
+        });
+    </script>
+</body>
+</html>
